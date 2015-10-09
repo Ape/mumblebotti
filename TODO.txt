@@ -1,0 +1,5 @@
+- Leaving messages to users
+	- Text messages
+	- Recording voice messages
+- Voice announcements for join, leave, mute, unmute, etc.
+- Sound board
