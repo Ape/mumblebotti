@@ -192,8 +192,8 @@ class Botti
 		stdin.puts(from_html(arg))
 		stdin.close
 
-		output_bold(user, to_html(format_lines(stdout.readlines)))
-		output_error(user, to_html(format_lines(stderr.readlines)))
+		output_bold(user, format_lines(stdout.readlines))
+		output_error(user, format_lines(stderr.readlines))
 	end
 
 	def cmd_ip(user, arg)
@@ -350,7 +350,7 @@ class Botti
 			lines.unshift "\n"
 		end
 
-		lines.join("")
+		to_html(lines.join(""))
 	end
 
 	def to_html(string)
