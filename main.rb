@@ -204,7 +204,7 @@ class Botti
 			request_stats(target) do |stats|
 				address = IPAddress::IPv6.parse_data(stats.address).compressed
 
-				if address[0..6] == "::ffff:"
+				if address.start_with? "::ffff:"
 					address = IPAddress::IPv6::Mapped.parse_data(stats.address).ipv4.address
 				end
 
