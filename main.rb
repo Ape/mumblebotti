@@ -260,8 +260,7 @@ class Botti
 
 	def cmd_lastseen(user, arg)
 		if @lastseen.length > 0
-			result = ([""] + @lastseen.map { |x| "#{x.name}: #{x.time.strftime("%H:%M")}" }).join("<br />\n")
-			output_bold(user, result)
+			output_bold(user, format_lines(@lastseen.map { |x| "#{x.name}: #{x.time.strftime("%H:%M")}" }))
 		else
 			output_bold(user, "No users.")
 		end
