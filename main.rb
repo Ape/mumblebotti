@@ -53,7 +53,7 @@ class Botti
 		end
 
 		@cli.on_user_remove do |info|
-			handle_leave(@cli.users[info.session].name)
+			handle_user_remove(info.session)
 		end
 
 		@cli.on_connected do
@@ -282,6 +282,19 @@ class Botti
 			end
 		else
 			log("Unknown state change: #{state}")
+		end
+	end
+
+	def handle_user_remove(session)
+		if @cli.me.nil?
+			# Not fully connected yet
+			return
+		end
+
+		user = @cli.users[session]
+
+		if user.channel_id == @cli.me.current_channel.channel_id
+			handle_leave(user.name)
 		end
 	end
 
