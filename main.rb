@@ -251,7 +251,7 @@ class Botti
 	end
 
 	def find_channel_user(name)
-		return @cli.me.current_channel.users.find { |u| u.name == name}
+		@cli.me.current_channel.users.find { |u| u.name == name}
 	end
 
 	def request_stats(user, &block)
@@ -260,7 +260,7 @@ class Botti
 	end
 
 	def isadmin(user)
-		return user.nil? || (ADMINS.include? user.name)
+		user.nil? || (ADMINS.include? user.name)
 	end
 
 	def handle_message(msg)
@@ -277,10 +277,7 @@ class Botti
 	end
 
 	def handle_user_state(state)
-		if @cli.me.nil?
-			# Not fully connected yet
-			return
-		end
+		return if @cli.me.nil? # Not fully connected yet
 
 		user = @cli.users[state.actor]
 
@@ -300,10 +297,7 @@ class Botti
 	end
 
 	def handle_user_remove(session)
-		if @cli.me.nil?
-			# Not fully connected yet
-			return
-		end
+		return if @cli.me.nil? # Not fully connected yet
 
 		user = @cli.users[session]
 
