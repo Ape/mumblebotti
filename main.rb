@@ -167,7 +167,7 @@ class Botti
 
 	def cmd_text(user, arg)
 		if arg.nil?
-			output_bold(user, "Usage: text &lt;message&gt;")
+			output_bold(user, to_html("Usage: text <message>"))
 			return
 		end
 
@@ -176,7 +176,7 @@ class Botti
 
 	def cmd_channel(user, arg)
 		if arg.nil?
-			output_bold(user, "Usage: channel &lt;channel&gt;")
+			output_bold(user, to_html("Usage: channel <channel>"))
 			return
 		end
 
@@ -199,7 +199,7 @@ class Botti
 
 	def cmd_ip(user, arg)
 		if arg.nil?
-			output_bold(user, "Usage: ip &lt;user&gt;")
+			output_bold(user, to_html("Usage: ip <user>"))
 			return
 		end
 
@@ -222,7 +222,7 @@ class Botti
 
 	def cmd_ping(user, arg)
 		if arg.nil?
-			output_bold(user, "Usage: ping &lt;user&gt;")
+			output_bold(user, to_html("Usage: ping <user>"))
 			return
 		end
 
@@ -245,7 +245,7 @@ class Botti
 
 	def cmd_idle(user, arg)
 		if arg.nil?
-			output_bold(user, "Usage: idle &lt;user&gt;")
+			output_bold(user, to_html("Usage: idle <user>"))
 			return
 		end
 
