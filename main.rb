@@ -303,20 +303,18 @@ class Botti
 	def handle_user_state(state)
 		return if @cli.me.nil? # Not fully connected yet
 
-		user = @cli.users[state.actor]
+		user = @cli.users[state.session]
 
 		if state.has_key? "channel_id"
 			if state["channel_id"] == @cli.me.current_channel.channel_id
-				if state.has_key?("name")
+				if state.has_key? "name"
 					handle_join(state.name)
-				else
+				elsif !user.nil?
 					handle_join(user.name)
 				end
-			else
+			elsif !user.nil? && !user.current_channel.nil? && user.current_channel.channel_id == @cli.me.current_channel.channel_id
 				handle_leave(user.name)
 			end
-		else
-			log("Unknown state change: #{state}")
 		end
 	end
 
