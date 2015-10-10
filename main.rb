@@ -301,7 +301,7 @@ class Botti
 	end
 
 	def handle_user_state(state)
-		return if @cli.me.nil? # Not fully connected yet
+		return if @cli.me.nil? || @cli.me.current_channel.nil? # Not fully connected yet
 
 		user = @cli.users[state.session]
 
@@ -319,7 +319,7 @@ class Botti
 	end
 
 	def handle_user_remove(session)
-		return if @cli.me.nil? # Not fully connected yet
+		return if @cli.me.nil? || @cli.me.current_channel.nil? # Not fully connected yet
 
 		user = @cli.users[session]
 
