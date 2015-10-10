@@ -11,6 +11,9 @@ CHANNEL = "Ape"
 BITRATE = 72000
 SAMPLE_RATE = 48000
 ADMINS = ["Ape"]
+CERT_COUNTRY = "FI"
+CERT_ORGANIZATION = "Ape3000.com"
+CERT_UNIT = "Bot"
 
 class Botti
 	class AlreadyRunning < StandardError; end
@@ -24,7 +27,12 @@ class Botti
 			conf.username = NAME
 			conf.bitrate = BITRATE
 			conf.sample_rate = SAMPLE_RATE
-			conf.ssl_cert_opts[:cert_dir] = File.expand_path("./")
+			conf.ssl_cert_opts = {
+				cert_dir: File.expand_path("./"),
+				country_code: CERT_COUNTRY,
+				organization: CERT_ORGANIZATION,
+				organization_unit: CERT_UNIT,
+			}
 		end
 
 		@lastseen = []
