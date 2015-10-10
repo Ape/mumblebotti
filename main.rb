@@ -22,7 +22,7 @@ class Botti
 
 	def initialize
 		@running = false
-
+		@lastseen = []
 		@cli = Mumble::Client.new(SERVER) do |conf|
 			conf.username = NAME
 			conf.bitrate = BITRATE
@@ -34,8 +34,6 @@ class Botti
 				organization_unit: CERT_UNIT,
 			}
 		end
-
-		@lastseen = []
 
 		setup_callbacks
 	end
@@ -57,8 +55,9 @@ class Botti
 	private
 
 	def setup_callbacks
-		@cli.on_text_message do |msg|
-			handle_message(msg)
+		@cli.on_connected do
+			@cli.me.deafen
+			@cli.join_channel(CHANNEL)
 		end
 
 		@cli.on_user_state do |state|
@@ -69,9 +68,8 @@ class Botti
 			handle_user_remove(info.session)
 		end
 
-		@cli.on_connected do
-			@cli.me.deafen
-			@cli.join_channel(CHANNEL)
+		@cli.on_text_message do |msg|
+			handle_message(msg)
 		end
 
 		@stats_callback = nil
