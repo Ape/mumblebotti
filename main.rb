@@ -183,6 +183,11 @@ class Botti
 	end
 
 	def cmd_python(user, arg)
+		if arg.nil?
+			output_bold(user, to_html("Usage: python <code>"))
+			return
+		end
+
 		stdin, stdout, stderr = Open3.popen3('python')
 		stdin.puts(from_html(arg))
 		stdin.close
