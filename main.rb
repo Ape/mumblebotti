@@ -67,7 +67,7 @@ class Botti
 		@stats_callback = nil
 
 		@cli.on_user_stats do |stats|
-			if !@stats_callback.nil?
+			unless @stats_callback.nil?
 				@stats_callback.call(stats)
 				@stats_callback = nil
 			end
