@@ -171,7 +171,7 @@ class Botti
 			return
 		end
 
-		send_message(arg)
+		send_message(to_html(arg))
 	end
 
 	def cmd_channel(user, arg)
@@ -194,6 +194,13 @@ class Botti
 			return
 		end
 
+		# Echo the code back with fixed white-space if needed
+		lines = from_html(arg).split("\n")
+		if lines.any? { |x| x.start_with? " " }
+			output(user, format_lines(lines))
+		end
+
+		# Execute
 		stdin, stdout, stderr = Open3.popen3('python')
 		stdin.puts(from_html(arg))
 		stdin.close
@@ -350,18 +357,19 @@ class Botti
 
 	def format_lines(lines)
 		if lines.length >= 2
-			lines.unshift "\n"
+			lines.unshift ""
 		end
 
-		to_html(lines.join(""))
+		to_html(lines.map { |x| x.chomp }
+		             .join("\n"))
 	end
 
 	def to_html(string)
-		CGI.escapeHTML(string).chomp.gsub(/\n/, "<br />")
+		CGI.escapeHTML(string).chomp.gsub(/ /, "&nbsp;").gsub(/\n/, "<br />")
 	end
 
 	def from_html(string)
-		CGI.unescapeHTML(string.gsub(/<br \/>/, "\n"))
+		CGI.unescapeHTML(string.gsub(/<br \/>/, "\n").gsub(/&nbsp;/, " "))
 	end
 end
 
