@@ -11,6 +11,8 @@ SAMPLE_RATE = 48000
 ADMINS = ["Ape"]
 
 class Botti
+	LastSeenRecord = Struct.new(:name, :time)
+
 	def initialize
 		@running = false
 
@@ -20,6 +22,8 @@ class Botti
 			conf.sample_rate = SAMPLE_RATE
 			conf.ssl_cert_opts[:cert_dir] = File.expand_path("./")
 		end
+
+		@lastseen = []
 
 		setup_callbacks
 	end
@@ -130,6 +134,8 @@ class Botti
 			cmd_ping(user, arg)
 		elsif cmd == "idle"
 			cmd_idle(user, arg)
+		elsif cmd == "lastseen"
+			cmd_lastseen(user, arg)
 		elsif cmd == "stream"
 			output_bold(user, "rtmp://ape3000.com/live/asd")
 		else
@@ -228,6 +234,15 @@ class Botti
 		end
 	end
 
+	def cmd_lastseen(user, arg)
+		if @lastseen.length > 0
+			result = ([""] + @lastseen.map { |x| "#{x.name}: #{x.time.strftime("%H:%M")}" }).join("<br />\n")
+			output_bold(user, result)
+		else
+			output_bold(user, "No users.")
+		end
+	end
+
 	def interval_format(seconds)
 		if seconds < 60*60
 			return Time.at(seconds).utc.strftime("%H:%M:%S")
@@ -300,10 +315,16 @@ class Botti
 
 	def handle_join(name)
 		log("#{name} joined.")
+
+		@lastseen.delete_if { |x| x.name == name }
 	end
 
 	def handle_leave(name)
 		log("#{name} left.")
+
+		@lastseen.delete_if { |x| x.name == name }
+		@lastseen.unshift LastSeenRecord.new(name, Time.new)
+		@lastseen = @lastseen.take(5)
 	end
 end
 
