@@ -103,19 +103,21 @@ class Botti
 	end
 
 	def output(user, message)
-		if user.nil?
-			log(message)
-		else
-			send_message(message)
+		unless message.empty?
+			if user.nil?
+				log(message)
+			else
+				send_message(message)
+			end
 		end
 	end
 
 	def output_bold(user, message)
-		output(user, "<b>#{message}</b>")
+		output(user, "<b>#{message}</b>") unless message.empty?
 	end
 
 	def output_error(user, message)
-		output_bold(user, "<span style='color:#ff0000'>#{message}</span>")
+		output_bold(user, "<span style='color:#ff0000'>#{message}</span>") unless message.empty?
 	end
 
 	def handle_command(user, command)
