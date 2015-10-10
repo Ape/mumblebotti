@@ -149,14 +149,8 @@ class Botti
 	end
 
 	def split_command(command)
-		cmd1, arg1 = command.split(" ", 2)
-		cmd2, arg2 = command.split("<br />", 2)
-
-		if cmd1.length < cmd2.length
-			return [cmd1, arg1]
-		else
-			return [cmd2, arg2]
-		end
+		[" ", "<br />"].map { |x| command.split(x, 2) }
+		               .min_by { |x| x[0].length unless x[0].nil? }
 	end
 
 	def cmd_exit(user, arg)
