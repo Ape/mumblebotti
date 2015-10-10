@@ -11,6 +11,8 @@ SAMPLE_RATE = 48000
 ADMINS = ["Ape"]
 
 class Botti
+	class AlreadyRunning < StandardError; end
+
 	LastSeenRecord = Struct.new(:name, :time)
 
 	def initialize
@@ -29,10 +31,7 @@ class Botti
 	end
 
 	def run
-		if @running
-			puts "Error: Already running."
-			return
-		end
+		raise AlreadyRunning if @running
 
 		@running = true
 		@cli.connect
