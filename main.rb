@@ -48,6 +48,14 @@ class Botti
 			handle_message(msg)
 		end
 
+		@cli.on_user_state do |state|
+			handle_user_state(state)
+		end
+
+		@cli.on_user_remove do |info|
+			handle_leave(@cli.users[info.session].name)
+		end
+
 		@cli.on_connected do
 			@cli.me.deafen
 			@cli.join_channel(CHANNEL)
@@ -252,6 +260,37 @@ class Botti
 				handle_command(sender, msg.message[1..-1])
 			end
 		end
+	end
+
+	def handle_user_state(state)
+		if @cli.me.nil?
+			# Not fully connected yet
+			return
+		end
+
+		user = @cli.users[state.actor]
+
+		if state.has_key? "channel_id"
+			if state["channel_id"] == @cli.me.current_channel.channel_id
+				if state.has_key?("name")
+					handle_join(state.name)
+				else
+					handle_join(user.name)
+				end
+			else
+				handle_leave(user.name)
+			end
+		else
+			log("Unknown state change: #{state}")
+		end
+	end
+
+	def handle_join(name)
+		log("#{name} joined.")
+	end
+
+	def handle_leave(name)
+		log("#{name} left.")
 	end
 end
 
