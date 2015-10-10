@@ -2,6 +2,8 @@
 
 require "mumble-ruby"
 require "ipaddress"
+require "open3"
+require "cgi"
 
 SERVER = "ape3000.com"
 NAME = "Botti"
@@ -121,7 +123,7 @@ class Botti
 	end
 
 	def handle_command(user, command)
-		cmd, arg = command.split(" ", 2)
+		cmd, arg = split_command(command)
 
 		if cmd == "exit" && isadmin(user)
 			cmd_exit(user, arg)
@@ -129,6 +131,8 @@ class Botti
 			cmd_text(user, arg)
 		elsif cmd == "channel" && isadmin(user)
 			cmd_channel(user, arg)
+		elsif cmd == "python" && isadmin(user)
+			cmd_python(user, arg)
 		elsif cmd == "ip"
 			cmd_ip(user, arg)
 		elsif cmd == "ping"
@@ -141,6 +145,17 @@ class Botti
 			output_bold(user, "rtmp://ape3000.com/live/asd")
 		else
 			output_error(user, "Unknown command: #{cmd}")
+		end
+	end
+
+	def split_command(command)
+		cmd1, arg1 = command.split(" ", 2)
+		cmd2, arg2 = command.split("<br />", 2)
+
+		if cmd1.length < cmd2.length
+			return [cmd1, arg1]
+		else
+			return [cmd2, arg2]
 		end
 	end
 
@@ -171,6 +186,15 @@ class Botti
 		else
 			@cli.join_channel(channel)
 		end
+	end
+
+	def cmd_python(user, arg)
+		stdin, stdout, stderr = Open3.popen3('python')
+		stdin.puts(from_html(arg))
+		stdin.close
+
+		output_bold(user, to_html(format_lines(stdout.readlines)))
+		output_error(user, to_html(format_lines(stderr.readlines)))
 	end
 
 	def cmd_ip(user, arg)
@@ -320,6 +344,22 @@ class Botti
 		@lastseen.delete_if { |x| x.name == name }
 		@lastseen.unshift LastSeenRecord.new(name, Time.new)
 		@lastseen = @lastseen.take(5)
+	end
+
+	def format_lines(lines)
+		if lines.length >= 2
+			lines.unshift "\n"
+		end
+
+		lines.join("")
+	end
+
+	def to_html(string)
+		CGI.escapeHTML(string).chomp.gsub(/\n/, "<br />")
+	end
+
+	def from_html(string)
+		CGI.unescapeHTML(string.gsub(/<br \/>/, "\n"))
 	end
 end
 
