@@ -149,6 +149,8 @@ class Botti
 			cmd_lastseen(user, arg)
 		elsif cmd == "stream"
 			output_bold(user, "rtmp://ape3000.com/live/asd")
+		elsif cmd == "help"
+			output_bold(user, to_html("!ip <user>, !ping <user>, !idle <user>, !lastseen, !stream"))
 		else
 			output_error(user, "Unknown command: #{cmd}")
 		end
