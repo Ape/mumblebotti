@@ -202,9 +202,14 @@ class Botti
 			output(user, format_lines(lines))
 		end
 
+		# Add print to one-liners
+		if lines.length == 1 && !lines[0].start_with?("print")
+			lines[0] = "print(#{lines[0]})"
+		end
+
 		# Execute
 		stdin, stdout, stderr = Open3.popen3('python')
-		stdin.puts(from_html(arg))
+		stdin.puts(lines.join("\n"))
 		stdin.close
 
 		output_bold(user, format_lines(stdout.readlines))
