@@ -12,6 +12,7 @@ CHANNEL = "Ape"
 BITRATE = 72000
 SAMPLE_RATE = 48000
 ADMINS = ["Ape"]
+MEMO_DIRECTORY = "memo"
 CERT_DIRECTORY = "certificates"
 CERT_COUNTRY = "FI"
 CERT_ORGANIZATION = "Ape3000.com"
@@ -165,8 +166,12 @@ class Botti
 			cmd_lastseen(user, arg)
 		elsif cmd == "math"
 			cmd_math(user, arg)
-		elsif cmd == "stream"
-			output_bold(user, "rtmp://ape3000.com/live/asd")
+		elsif cmd == "memo"
+			cmd_memo(user, arg)
+		elsif cmd == "addmemo"
+			cmd_addmemo(user, arg)
+		elsif cmd == "delmemo"
+			cmd_delmemo(user, arg)
 		else
 			output_error(user, "Unknown command: #{cmd}")
 		end
@@ -184,7 +189,9 @@ class Botti
 			"!idle <user>",
 			"!lastseen",
 			"!math <formula>",
-			"!stream",
+			"!memo <name>",
+			"!addmemo <name> <text>",
+			"!delmemo <name>",
 		]))
 	end
 
@@ -329,6 +336,65 @@ class Botti
 			output_bold(user, "No output.")
 		else
 			send_image("math.png")
+		end
+	end
+
+	def cmd_memo(user, arg)
+		if arg.nil?
+			output_bold(user, to_html("Usage: memo <name>"))
+			return
+		end
+
+		if !arg.match(/^[[:alnum:]]+$/)
+			output_error(user, "Error: Only alphanumeric names are allowed.")
+			return
+		end
+
+		begin
+			text = File.read("#{MEMO_DIRECTORY}/#{arg}")
+		rescue
+			output_error(user, "Memo '#{arg}' not found.")
+		else
+			output_bold(user, text)
+		end
+	end
+
+	def cmd_addmemo(user, arg)
+		if arg.nil? || arg.split(" ", 2).length < 2
+			output_bold(user, to_html("Usage: addmemo <name> <text>"))
+			return
+		end
+
+		name, text = arg.split(" ", 2)
+
+		if !name.match(/^[[:alnum:]]+$/)
+			output_error(user, "Error: Only alphanumeric names are allowed.")
+			return
+		end
+
+		FileUtils.mkdir_p(MEMO_DIRECTORY)
+		File.write("#{MEMO_DIRECTORY}/#{name}", text)
+
+		output_bold(user, "Memo '#{name}' saved.")
+	end
+
+	def cmd_delmemo(user, arg)
+		if arg.nil?
+			output_bold(user, to_html("Usage: delmemo <name>"))
+			return
+		end
+
+		if !arg.match(/^[[:alnum:]]+$/)
+			output_error(user, "Error: Only alphanumeric names are allowed.")
+			return
+		end
+
+		begin
+			File.delete("#{MEMO_DIRECTORY}/#{arg}")
+		rescue
+			output_error(user, "Memo '#{arg}' not found.")
+		else
+			output_bold(user, "Memo '#{arg}' deleted.")
 		end
 	end
 
