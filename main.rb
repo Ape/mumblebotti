@@ -23,6 +23,7 @@ class Botti
 	def initialize
 		@running = false
 		@lastseen = []
+		@lognewline = false
 		@cli = Mumble::Client.new(SERVER) do |conf|
 			conf.username = NAME
 			conf.bitrate = BITRATE
@@ -83,6 +84,7 @@ class Botti
 	end
 
 	def read_input
+		@lognewline = true
 		print "> "
 		$stdout.flush
 
@@ -95,6 +97,7 @@ class Botti
 		rescue IOError
 			@running = false
 		else
+			@lognewline = false
 			handle_command(nil, input.chomp)
 		end
 	end
@@ -108,10 +111,12 @@ class Botti
 	end
 
 	def log(message)
-		puts
+		if @lognewline
+			@lognewline = false
+			puts
+		end
+
 		puts message
-		print ">> "
-		$stdout.flush
 	end
 
 	def output(user, message)
