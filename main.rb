@@ -343,7 +343,7 @@ class Botti
 
 		user = @cli.users[session]
 
-		if user.channel_id == @cli.me.current_channel.channel_id
+		if !user.nil? && user.channel_id == @cli.me.current_channel.channel_id
 			handle_leave(user.name)
 		end
 	end
