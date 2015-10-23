@@ -4,6 +4,7 @@ require "mumble-ruby"
 require "ipaddress"
 require "open3"
 require "cgi"
+require "fileutils"
 
 SERVER = "ape3000.com"
 NAME = "Botti"
@@ -11,6 +12,7 @@ CHANNEL = "Ape"
 BITRATE = 72000
 SAMPLE_RATE = 48000
 ADMINS = ["Ape"]
+CERT_DIRECTORY = "certificates"
 CERT_COUNTRY = "FI"
 CERT_ORGANIZATION = "Ape3000.com"
 CERT_UNIT = "Bot"
@@ -24,12 +26,15 @@ class Botti
 		@running = false
 		@lastseen = []
 		@lognewline = false
+
+		FileUtils.mkdir_p(CERT_DIRECTORY)
+
 		@cli = Mumble::Client.new(SERVER) do |conf|
 			conf.username = NAME
 			conf.bitrate = BITRATE
 			conf.sample_rate = SAMPLE_RATE
 			conf.ssl_cert_opts = {
-				cert_dir: File.expand_path("./"),
+				cert_dir: CERT_DIRECTORY,
 				country_code: CERT_COUNTRY,
 				organization: CERT_ORGANIZATION,
 				organization_unit: CERT_UNIT,
