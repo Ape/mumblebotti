@@ -285,6 +285,8 @@ class Botti
 	end
 
 	def cmd_lastseen(user, arg)
+		@lastseen.delete_if { |x| (Time.new - x.time) > 60*60*22 }
+
 		if @lastseen.length > 0
 			output_bold(user, format_lines(@lastseen.map { |x| "#{x.name}: #{x.time.strftime("%H:%M")}" }))
 		else
