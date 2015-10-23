@@ -103,6 +103,10 @@ class Botti
 		@cli.me.current_channel.send_text(message)
 	end
 
+	def send_image(path)
+		@cli.me.current_channel.send_image(path)
+	end
+
 	def log(message)
 		puts
 		puts message
@@ -147,10 +151,12 @@ class Botti
 			cmd_idle(user, arg)
 		elsif cmd == "lastseen"
 			cmd_lastseen(user, arg)
+		elsif cmd == "math"
+			cmd_math(user, arg)
 		elsif cmd == "stream"
 			output_bold(user, "rtmp://ape3000.com/live/asd")
 		elsif cmd == "help"
-			output_bold(user, to_html("!ip <user>, !ping <user>, !idle <user>, !lastseen, !stream"))
+			output_bold(user, to_html("!ip <user>, !ping <user>, !idle <user>, !lastseen, !math <formula>, !stream"))
 		else
 			output_error(user, "Unknown command: #{cmd}")
 		end
@@ -283,6 +289,23 @@ class Botti
 			output_bold(user, format_lines(@lastseen.map { |x| "#{x.name}: #{x.time.strftime("%H:%M")}" }))
 		else
 			output_bold(user, "No users.")
+		end
+	end
+
+	def cmd_math(user, arg)
+		if arg.nil?
+			output_bold(user, to_html("Usage: math <formula>"))
+			return
+		end
+
+		File.write("math.tex", from_html(arg))
+		%x(tex2im math.tex) # Writes math.png
+
+		# Only show non-empty output images to prevent some problematic behavior
+		if %x(identify -format %[standard-deviation] math.png) == "-nan"
+			output_bold(user, "No output.")
+		else
+			send_image("math.png")
 		end
 	end
 
