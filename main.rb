@@ -145,7 +145,9 @@ class Botti
 	def handle_command(user, command)
 		cmd, arg = split_command(command)
 
-		if cmd == "exit" && isadmin(user)
+		if cmd == "help"
+			cmd_help(user, arg)
+		elsif cmd == "exit" && isadmin(user)
 			cmd_exit(user, arg)
 		elsif cmd == "text" && isadmin(user)
 			cmd_text(user, arg)
@@ -165,8 +167,6 @@ class Botti
 			cmd_math(user, arg)
 		elsif cmd == "stream"
 			output_bold(user, "rtmp://ape3000.com/live/asd")
-		elsif cmd == "help"
-			output_bold(user, to_html("!ip <user>, !ping <user>, !idle <user>, !lastseen, !math <formula>, !stream"))
 		else
 			output_error(user, "Unknown command: #{cmd}")
 		end
@@ -175,6 +175,17 @@ class Botti
 	def split_command(command)
 		[" ", "<br />"].map { |x| command.split(x, 2) }
 		               .min_by { |x| x[0].length unless x[0].nil? }
+	end
+
+	def cmd_help(user, arg)
+		output_bold(user, format_lines([
+			"!ip <user>",
+			"!ping <user>",
+			"!idle <user>",
+			"!lastseen",
+			"!math <formula>",
+			"!stream",
+		]))
 	end
 
 	def cmd_exit(user, arg)
