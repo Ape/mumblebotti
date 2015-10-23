@@ -367,6 +367,11 @@ class Botti
 
 		name, text = arg.split(" ", 2)
 
+		if name.length > 20
+			output_error(user, "Error: Maximum name length is 20 characters.")
+			return
+		end
+
 		if !name.match(/^[[:alnum:]]+$/)
 			output_error(user, "Error: Only alphanumeric names are allowed.")
 			return
