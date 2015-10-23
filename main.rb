@@ -116,7 +116,7 @@ class Botti
 			puts
 		end
 
-		puts message
+		puts "[#{Time.now.strftime("%H:%M")}] #{message}"
 	end
 
 	def output(user, message)
