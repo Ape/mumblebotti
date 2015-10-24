@@ -35,10 +35,10 @@ class Botti
       conf.bitrate = BITRATE
       conf.sample_rate = SAMPLE_RATE
       conf.ssl_cert_opts = {
-        cert_dir: CERT_DIRECTORY,
-        country_code: CERT_COUNTRY,
-        organization: CERT_ORGANIZATION,
-        organization_unit: CERT_UNIT,
+        :cert_dir => CERT_DIRECTORY,
+        :country_code => CERT_COUNTRY,
+        :organization => CERT_ORGANIZATION,
+        :organization_unit => CERT_UNIT,
       }
     end
 
