@@ -348,7 +348,7 @@ class Botti
 
     begin
       text = File.read("#{MEMO_DIRECTORY}/#{arg}")
-    rescue
+    rescue SystemCallError
       output_error(user, "Memo '#{arg}' not found.")
     else
       output_bold(user, text)
@@ -392,7 +392,7 @@ class Botti
 
     begin
       File.delete("#{MEMO_DIRECTORY}/#{arg}")
-    rescue
+    rescue SystemCallError
       output_error(user, "Memo '#{arg}' not found.")
     else
       output_bold(user, "Memo '#{arg}' deleted.")
