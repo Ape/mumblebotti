@@ -13,10 +13,12 @@ BITRATE = 72000
 SAMPLE_RATE = 48000
 ADMINS = ["Ape"]
 MEMO_DIRECTORY = "memo"
-CERT_DIRECTORY = "certificates"
-CERT_COUNTRY = "FI"
-CERT_ORGANIZATION = "Ape3000.com"
-CERT_UNIT = "Bot"
+CERT_OPTIONS = {
+  :cert_dir => "certificates",
+  :country_code => "FI",
+  :organization => "Ape3000.com",
+  :organization_unit => "Bot",
+}
 
 class Botti
   class AlreadyRunning < StandardError; end
@@ -28,18 +30,13 @@ class Botti
     @lastseen = []
     @lognewline = false
 
-    FileUtils.mkdir_p(CERT_DIRECTORY)
+    FileUtils.mkdir_p(CERT_OPTIONS[:cert_dir])
 
     @cli = Mumble::Client.new(SERVER) do |conf|
       conf.username = NAME
       conf.bitrate = BITRATE
       conf.sample_rate = SAMPLE_RATE
-      conf.ssl_cert_opts = {
-        :cert_dir => CERT_DIRECTORY,
-        :country_code => CERT_COUNTRY,
-        :organization => CERT_ORGANIZATION,
-        :organization_unit => CERT_UNIT,
-      }
+      conf.ssl_cert_opts = CERT_OPTIONS
     end
 
     setup_callbacks
