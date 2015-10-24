@@ -225,24 +225,33 @@ class Botti
       return
     end
 
-    # Echo the code back with fixed white-space if needed
     lines = from_html(arg).split("\n")
+    echo_with_fixed_whitespace(lines)
+    wrap_oneliner_print!(lines)
+    out, err = execute_python(lines)
+
+    output_bold(user, format_lines(out))
+    output_error(user, format_lines(err))
+  end
+
+  def echo_with_fixed_whitespace(lines)
     if lines.any? { |x| x.start_with? " " }
       output(user, format_lines(lines))
     end
+  end
 
-    # Add print to one-liners
+  def wrap_oneliner_print!(lines)
     if lines.length == 1 && !lines[0].start_with?("print")
       lines[0] = "print(#{lines[0]})"
     end
+  end
 
-    # Execute
+  def execute_python(lines)
     stdin, stdout, stderr = Open3.popen3('python')
     stdin.puts(lines.join("\n"))
     stdin.close
 
-    output_bold(user, format_lines(stdout.readlines))
-    output_error(user, format_lines(stderr.readlines))
+    [stdout.readlines, stderr.readlines]
   end
 
   def cmd_ip(user, arg)
