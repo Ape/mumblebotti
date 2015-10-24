@@ -95,11 +95,7 @@ class Botti
     $stdout.flush
 
     begin
-      input = gets
-
-      if input.nil?
-        input = "exit"
-      end
+      input = gets || "exit"
     rescue IOError
       @running = false
     else
