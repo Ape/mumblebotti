@@ -247,7 +247,7 @@ class Botti
   end
 
   def execute_python(lines)
-    stdin, stdout, stderr = Open3.popen3('python')
+    stdin, stdout, stderr = Open3.popen3("python")
     stdin.puts(lines.join("\n"))
     stdin.close
 
