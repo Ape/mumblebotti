@@ -144,13 +144,13 @@ class Botti
 
     if cmd == "help"
       cmd_help(user, arg)
-    elsif cmd == "exit" && isadmin(user)
+    elsif cmd == "exit" && isadmin?(user)
       cmd_exit(user, arg)
-    elsif cmd == "text" && isadmin(user)
+    elsif cmd == "text" && isadmin?(user)
       cmd_text(user, arg)
-    elsif cmd == "channel" && isadmin(user)
+    elsif cmd == "channel" && isadmin?(user)
       cmd_channel(user, arg)
-    elsif cmd == "python" && isadmin(user)
+    elsif cmd == "python" && isadmin?(user)
       cmd_python(user, arg)
     elsif cmd == "ip"
       cmd_ip(user, arg)
@@ -416,7 +416,7 @@ class Botti
     user.stats
   end
 
-  def isadmin(user)
+  def isadmin?(user)
     user.nil? || (ADMINS.include? user.name)
   end
 
