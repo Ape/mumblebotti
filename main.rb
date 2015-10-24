@@ -133,7 +133,9 @@ class Botti
   end
 
   def output_error(user, message)
-    output_bold(user, "<span style='color:#ff0000'>#{message}</span>") unless message.empty?
+    unless message.empty?
+      output_bold(user, "<span style='color:#ff0000'>#{message}</span>")
+    end
   end
 
   def handle_command(user, command)
@@ -277,16 +279,35 @@ class Botti
       output_error(user, "Error: Cannot find user '#{arg}'.")
     else
       request_stats(target) do |stats|
-        total_to = stats.from_server.lost + stats.from_server.late + stats.from_server.good + 0.00001
-        total_from = stats.from_client.lost + stats.from_client.late + stats.from_client.good + 0.00001
-
-        output(user, "<br />\n"\
-                     "<b>TCP:</b> #{format("%.1f", stats.tcp_ping_avg)} ± #{format("%.1f", Math.sqrt(stats.tcp_ping_var))} ms<br />\n"\
-                     "<b>UDP:</b> #{format("%.1f", stats.udp_ping_avg)} ± #{format("%.1f", Math.sqrt(stats.udp_ping_var))} ms<br />\n"\
-                     "<b>Loss-&gt;:</b> #{format("%.2f", 100 * stats.from_server.lost / total_to)} % / #{format("%.2f", 100 * stats.from_server.late / total_to)} %<br />\n"\
-                     "<b>Loss&lt;-:</b> #{format("%.2f", 100 * stats.from_client.lost / total_from)} % / #{format("%.2f", 100 * stats.from_client.late / total_from)} %")
+        output(user, format_stats(stats))
       end
     end
+  end
+
+  def format_stats(stats)
+    total_to = total_packets(stats.from_server)
+    total_from = total_packets(stats.from_client)
+
+    "<br />\n"\
+    "<b>TCP:</b> #{ping_stats(stats.tcp_ping_avg, stats.tcp_ping_var)}<br />\n"\
+    "<b>UDP:</b> #{ping_stats(stats.udp_ping_avg, stats.udp_ping_var)}<br />\n"\
+    "<b>Loss-&gt;:</b> #{loss_percentage(stats.from_server.lost, total_to)} / "\
+    "#{loss_percentage(stats.from_server.late, total_to)}<br />\n"\
+    "<b>Loss&lt;-:</b> #{loss_percentage(stats.from_client.lost, total_from)} / "\
+    "#{loss_percentage(stats.from_client.late, total_from)}"
+  end
+
+  def total_packets(info)
+    [info.lost, info.late, info.good].reduce(:+)
+  end
+
+  def ping_stats(average, variance)
+    "#{format("%.1f", average)} ± #{format("%.1f", Math.sqrt(variance))} ms"
+  end
+
+  def loss_percentage(packets, total)
+    percentage = (0 if total.zero?) || 100.0 * packets / total
+    "#{format("%.2f", percentage)} %"
   end
 
   def cmd_idle(user, arg)
@@ -309,7 +330,8 @@ class Botti
     @lastseen.delete_if { |x| (Time.new - x.time) > 60*60*22 }
 
     if @lastseen.length > 0
-      output_bold(user, format_lines(@lastseen.map { |x| "#{x.name}: #{x.time.strftime("%H:%M")}" }))
+      lines = @lastseen.map { |x| "#{x.name}: #{x.time.strftime("%H:%M")}" }
+      output_bold(user, format_lines(lines))
     else
       output_bold(user, "No users.")
     end
@@ -417,6 +439,10 @@ class Botti
     user.nil? || (ADMINS.include? user.name)
   end
 
+  def on_same_channel?(user)
+    !@cli.me.nil? && !user.nil? && user.channel_id == @cli.me.channel_id
+  end
+
   def handle_message(msg)
     if msg.actor.nil?
       log("$ #{msg.message}")
@@ -431,29 +457,25 @@ class Botti
   end
 
   def handle_user_state(state)
-    return if @cli.me.nil? || @cli.me.current_channel.nil? # Not fully connected yet
-
     user = @cli.users[state.session]
 
     if state.has_key? "channel_id"
-      if state["channel_id"] == @cli.me.current_channel.channel_id
+      if !@cli.me.nil? && state["channel_id"] == @cli.me.channel_id
         if state.has_key? "name"
           handle_join(state.name)
         elsif !user.nil?
           handle_join(user.name)
         end
-      elsif !user.nil? && !user.current_channel.nil? && user.current_channel.channel_id == @cli.me.current_channel.channel_id
+      elsif on_same_channel?(user)
         handle_leave(user.name)
       end
     end
   end
 
   def handle_user_remove(session)
-    return if @cli.me.nil? || @cli.me.current_channel.nil? # Not fully connected yet
-
     user = @cli.users[session]
 
-    if !user.nil? && user.channel_id == @cli.me.current_channel.channel_id
+    if on_same_channel?(user)
       handle_leave(user.name)
     end
   end
