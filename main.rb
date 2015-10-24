@@ -345,7 +345,7 @@ class Botti
       return
     end
 
-    if !arg.match(/^[[:alnum:]]+$/)
+    unless arg.match(/^[[:alnum:]]+$/)
       output_error(user, "Error: Only alphanumeric names are allowed.")
       return
     end
@@ -372,7 +372,7 @@ class Botti
       return
     end
 
-    if !name.match(/^[[:alnum:]]+$/)
+    unless name.match(/^[[:alnum:]]+$/)
       output_error(user, "Error: Only alphanumeric names are allowed.")
       return
     end
@@ -389,7 +389,7 @@ class Botti
       return
     end
 
-    if !arg.match(/^[[:alnum:]]+$/)
+    unless arg.match(/^[[:alnum:]]+$/)
       output_error(user, "Error: Only alphanumeric names are allowed.")
       return
     end
