@@ -405,9 +405,9 @@ class Botti
 
   def interval_format(seconds)
     if seconds < 60*60*24
-      return Time.at(seconds).utc.strftime("%H:%M:%S")
+      Time.at(seconds).utc.strftime("%H:%M:%S")
     else
-      return "More than a day"
+      "More than a day"
     end
   end
 
