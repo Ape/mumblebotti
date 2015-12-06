@@ -7,7 +7,7 @@ require "cgi"
 require "fileutils"
 
 SERVER = "ape3000.com"
-NAME = "Botti"
+NAME = "@Botti"
 CHANNEL = "Ape"
 BITRATE = 72000
 SAMPLE_RATE = 48000
