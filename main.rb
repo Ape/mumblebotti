@@ -226,7 +226,7 @@ class Botti
     end
 
     lines = from_html(arg).split("\n")
-    echo_with_fixed_whitespace(lines)
+    echo_with_fixed_whitespace(user, lines)
     wrap_oneliner_print!(lines)
     out, err = execute_python(lines)
 
@@ -234,7 +234,7 @@ class Botti
     output_error(user, format_lines(err))
   end
 
-  def echo_with_fixed_whitespace(lines)
+  def echo_with_fixed_whitespace(user, lines)
     if lines.any? { |x| x.start_with? " " }
       output(user, format_lines(lines))
     end
