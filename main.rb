@@ -236,7 +236,7 @@ class Botti
 
   def echo_with_fixed_whitespace(user, lines)
     if lines.any? { |x| x.start_with? " " }
-      output(user, format_lines(lines))
+      output(user, format_lines(lines, "!python"))
     end
   end
 
@@ -503,9 +503,9 @@ class Botti
     @lastseen = @lastseen.take(5)
   end
 
-  def format_lines(lines)
+  def format_lines(lines, first_line = "")
     if lines.length >= 2
-      lines.unshift ""
+      lines = [first_line] + lines
     end
 
     to_html(lines.map { |x| x.chomp }
