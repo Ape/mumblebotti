@@ -494,13 +494,30 @@ class Botti
     end
 
     if video.available?
-      duration = interval_format(video.duration)
-      views = shorten_number(video.view_count)
-      msg = "<br />"\
-            "#{video.title} <b>[#{duration}, #{views} views]</b><br />"\
-            "Keywords: #{video.keywords[0..4].join(", ")}<br />"\
-            "<a href='#{url}'><img src='#{video.thumbnail_medium}' /></a>"
+      duration = format_duration(video.duration)
+      views = format_views(video.view_count)
+      keywords = format_keywords(video.keywords)
+      thumbnail = format_thumbnail(video, url)
+
+      msg = "<br />#{video.title} <b>[#{duration}#{views}]</b>"\
+            "#{keywords}#{thumbnail}"
       output(sender, msg)
+    end
+  end
+
+  def format_duration(duration)
+    if duration.nil? || duration <= 0
+      "playlist"
+    else
+      interval_format(duration)
+    end
+  end
+
+  def format_views(views)
+    if views.nil? || views <= 0
+      ""
+    else
+      ", #{shorten_number(views)} views"
     end
   end
 
@@ -511,6 +528,38 @@ class Botti
         return "#{(number / 1000.0**i).round(i)}#{prefix}"
       end
     end
+  end
+
+  def format_keywords(keywords)
+    if keywords.nil?
+      return ""
+    elsif keywords.is_a? String
+      text = keywords
+    else
+      text = keywords[0..4].join(", ")
+    end
+
+    "<br />Keywords: #{text}"
+  end
+
+  def format_thumbnail(video, url)
+    thumbnail = get_video_thumbnail(video)
+    if thumbnail.nil?
+      ""
+    else
+      "<br /><a href='#{url}'><img src='#{thumbnail}' /></a>"
+    end
+  end
+
+  def get_video_thumbnail(video)
+    [:thumbnail_medium, :thumbnail_small].each do |method|
+      begin
+        return video.send(method)
+      rescue NoMethodError
+      end
+    end
+
+    nil
   end
 
   def handle_user_state(state)
