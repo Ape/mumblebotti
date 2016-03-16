@@ -508,7 +508,7 @@ class Botti
     prefixes = ["", "k", "M"]
     prefixes.each_with_index do |prefix, i|
       if number < 1000**(i+1) || i == prefixes.length - 1
-        return "#{(number / 1000.0**i).round(1)}#{prefix}"
+        return "#{(number / 1000.0**i).round(i)}#{prefix}"
       end
     end
   end
