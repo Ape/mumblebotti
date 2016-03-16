@@ -533,14 +533,12 @@ class Botti
 
   def format_keywords(keywords)
     if keywords.nil?
-      return ""
+      ""
     elsif keywords.is_a? String
-      text = keywords
+      "<br />#{keywords}"
     else
-      text = keywords[0..4].join(", ")
+      "<br />#{keywords[0..4].join(", ")}"
     end
-
-    "<br />Keywords: #{text}"
   end
 
   def format_thumbnail(video, url)
