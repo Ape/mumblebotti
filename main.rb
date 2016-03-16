@@ -481,19 +481,27 @@ class Botti
         if [".png", ".jpg", ".jpeg", ".gif"].any? { |x| match[0].end_with? x}
           output(sender, "<a href='#{match[0]}'><img src='#{match[0]}' /></a>")
         else
-          video = VideoInfo.new(match[0])
-          if video.available?
-            msg = "<br />#{video.title}"\
-                  " <b>[#{interval_format(video.duration)},"\
-                  " #{shorten_number(video.view_count)} views]</b><br />"\
-                  "Keywords: #{video.keywords[0..4].join(", ")}<br />"\
-                  "<a href='#{match[0]}'>"\
-                  "<img src='#{video.thumbnail_medium}' />"\
-                  "</a>"
-            output(sender, msg)
-          end
+          send_video_info(sender, match[0])
         end
       end
+  end
+
+  def send_video_info(sender, url)
+    begin
+      video = VideoInfo.new(url)
+    rescue VideoInfo::UrlError
+      return
+    end
+
+    if video.available?
+      duration = interval_format(video.duration)
+      views = shorten_number(video.view_count)
+      msg = "<br />"\
+            "#{video.title} <b>[#{duration}, #{views} views]</b><br />"\
+            "Keywords: #{video.keywords[0..4].join(", ")}<br />"\
+            "<a href='#{url}'><img src='#{video.thumbnail_medium}' /></a>"
+      output(sender, msg)
+    end
   end
 
   def shorten_number(number)
