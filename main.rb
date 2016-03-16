@@ -5,6 +5,7 @@ require "ipaddress"
 require "open3"
 require "cgi"
 require "fileutils"
+require "video_info"
 
 SERVER = "ape3000.com"
 NAME = "@Botti"
@@ -19,6 +20,7 @@ CERT_OPTIONS = {
   :organization => "Ape3000.com",
   :organization_unit => "Bot",
 }
+VideoInfo.provider_api_keys = { youtube: "YOUR-API-KEY-HERE" }
 
 class Botti
   class AlreadyRunning < StandardError; end
@@ -474,10 +476,33 @@ class Botti
   end
 
   def handle_message_url(sender, message)
-      message.scan(/href\s*=\s*"([^"]*(\.png|\.jpg|\.jpeg|\.gif))"/i)
+      message.scan(/href\s*=\s*"([^"]*)"/i)
              .each do |match|
-        output(sender, "<a href='#{match[0]}'><img src='#{match[0]}' /></a>")
+        if [".png", ".jpg", ".jpeg", ".gif"].any? { |x| match[0].end_with? x}
+          output(sender, "<a href='#{match[0]}'><img src='#{match[0]}' /></a>")
+        else
+          video = VideoInfo.new(match[0])
+          if video.available?
+            msg = "<br />#{video.title}"\
+                  " <b>[#{interval_format(video.duration)},"\
+                  " #{shorten_number(video.view_count)} views]</b><br />"\
+                  "Keywords: #{video.keywords[0..4].join(", ")}<br />"\
+                  "<a href='#{match[0]}'>"\
+                  "<img src='#{video.thumbnail_medium}' />"\
+                  "</a>"
+            output(sender, msg)
+          end
+        end
       end
+  end
+
+  def shorten_number(number)
+    prefixes = ["", "k", "M"]
+    prefixes.each_with_index do |prefix, i|
+      if number < 1000**(i+1) || i == prefixes.length - 1
+        return "#{(number / 1000.0**i).round(1)}#{prefix}"
+      end
+    end
   end
 
   def handle_user_state(state)
