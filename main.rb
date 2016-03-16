@@ -499,7 +499,8 @@ class Botti
       keywords = format_keywords(video.keywords)
       thumbnail = format_thumbnail(video, url)
 
-      msg = "<br />#{video.title} <b>[#{duration}#{views}]</b>"\
+      msg = "<br />"\
+            "<a href='#{url}'>#{video.title}</a> <b>[#{duration}#{views}]</b>"\
             "#{keywords}#{thumbnail}"
       output(sender, msg)
     end
