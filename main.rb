@@ -461,8 +461,17 @@ class Botti
 
       if msg.message[0] == "!"
         handle_command(sender, msg.message[1..-1])
+      else
+        handle_message_url(sender, msg.message)
       end
     end
+  end
+
+  def handle_message_url(sender, message)
+      message.scan(/href\s*=\s*"([^"]*(\.png|\.jpg|\.jpeg|\.gif))"/i)
+             .each do |match|
+        output(sender, "<a href='#{match[0]}'><img src='#{match[0]}' /></a>")
+      end
   end
 
   def handle_user_state(state)
